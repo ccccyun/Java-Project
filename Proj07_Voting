@@ -1,0 +1,196 @@
+/* class The Alternative Vote*
+
+* CSc 127A Spring 16, Project 07
+*
+* Author: TODO: Chih Yun Chen
+*
+* SL Name: TODO: Abigail Dodd
+
+* Add some new methods base on project06. One will implement a simple 
+simple election & Alternative Vote election methods will call the doVoting() method.
+This will do one round of voting. Another helper method, named arrayDel(),will delete a single
+element from an array.
+*
+*/
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class Proj07_Voting {
+
+ public static void main(String[] args) {
+  if (args.length != 1) {
+   println("There should be exactlly one argument, the input file path.");
+   System.exit(0);
+  }
+
+  String[] candidates = new String[5];
+  Voter[] voters = new Voter[12];
+
+  readFromFile(args[0], candidates, voters);
+
+  printVoters(voters);
+
+  printCandidates(candidates);
+
+  doSimpleElection(voters, candidates);
+
+  doAlternativeVoteElection(voters, candidates);
+ }
+
+ public static void readFromFile(String fileName, String[] candidates, Voter[] voters) {
+  File file = new File(fileName);
+
+     try {
+         Scanner sc = new Scanner(file);
+
+         // store 5 candidates
+         for (int i = 0; i < 5; i++) {
+          candidates[i] = sc.next();
+         }
+
+         // store 12 voters
+         for (int i = 0; i < 12; i++) {
+           // initiate each voter
+           voters[i] = new Voter();
+           voters[i].name = sc.next();
+           voters[i].preferences = new String[5];
+
+          for (int j = 0; j < 5; j++) {
+           voters[i].preferences[j] = sc.next();
+          }
+         }
+
+         sc.close();
+     } catch (FileNotFoundException e) {
+         println("No such file or directory");
+         System.exit(0);
+     }
+ }
+
+ public static void printVoters(Voter[] voters) {
+  println("THESE ARE THE VOTERS:");
+
+  for (Voter voter : voters) {
+   voter.print();
+  }
+ }
+
+ public static void printCandidates(String[] candidates) {
+  println("THESE ARE THE CANDIDATES:");
+
+  for (String candidate : candidates) {
+   println(candidate);
+  }
+ }
+
+ public static void println(String s) {
+  System.out.println(s);
+ }
+
+
+ /************************ proj 07 added methods *****************************/
+
+ // This method takes two parameters: an array of voters, and an array of candidate names. 
+ // It returns an array of int, representing the number of votes earned by each candidate. 
+ public static int[] doVoting(Voter[] voters, String[] candidates) {
+  int[] numOfVotes = new int[candidates.length];
+
+  for (Voter voter : voters) {
+   int candidateIndex = voter.vote(candidates);
+   if (candidateIndex >= 0 && candidateIndex < numOfVotes.length) {
+    numOfVotes[candidateIndex]++;
+   }
+  }
+
+  return numOfVotes;
+ }
+
+ public static void doSimpleElection(Voter[] voters, String[] candidates) {
+  println("STARTING A SIMPLE ELECTION:");
+  println("Beginning voting...");
+
+  int[] numOfVotes = doVoting(voters, candidates);
+  int maxIndex = getmaxIndex [numOfVoters];
+
+  println("Voting has ended...");
+  println(candidates[maxIndex] + " WON THE SIMPLE ELECTION.");
+ }
+
+ public static void doAlternativeVoteElection(Voter[] voters, String[] candidates) {
+  println("STARTING AN ALTERNATIVE VOTE ELECTION:");
+
+  String winner = null;
+
+  while (winner == null) {
+   println("Beginning voting...");
+   int[] numOfVotes = doVoting(voters, candidates);
+   println("Voting has ended...");
+
+   int maxIndex = getMaxIndex(numOfVotes);
+   if (numOfVotes[maxIndex] * 2 > getSum(numOfVotes)) {
+    // winner found
+    winner = candidates[maxIndex];
+   } else {
+    // remove candidate who has the least vote
+    int minIndex = getMinIndex(numOfVotes);
+    println("No winner yet.  Removing the candidate " + candidates[minIndex]);
+    candidates = arrayDel(candidates, minIndex);
+   }
+  }
+
+  println(winner + " WON THE ALTERNATIVE VOTE ELECTION.");
+ }
+
+ public static String[] arrayDel(String[] candidates, int indexOfCandidateToBeRemoved) {
+  String[] ret = new String[candidates.length - 1];
+
+  for (int indexOfOld = 0, indexOfNew = 0; indexOfOld < candidates.length; indexOfOld++, indexOfNew++) {
+   if (indexOfOld != indexOfCandidateToBeRemoved) {
+    ret[indexOfNew] = candidates[indexOfOld];
+   } else {
+    indexOfNew--;
+   }
+  }
+
+  return ret;
+ }
+
+ public static int getSum(int[] numOfVotes) {
+  int sum = 0;
+
+  for (int numOfVote : numOfVotes) {
+   sum += numOfVote;
+  }
+
+  return sum;
+ }
+
+ 
+public static int getMinIndex(int[] numOfVotes) {
+  int minIndex = 0;
+
+  for (int i = 0; i < numOfVotes.length; i++) {
+   if (numOfVotes[i] < numOfVotes[minIndex]) {
+    minIndex = i;
+   }
+  }
+
+  return minIndex;
+ }
+
+ public static int getMaxIndex(int[] numOfVotes) {
+  int maxIndex = 0;
+
+  for (int i = 0; i < numOfVotes.length; i++) {
+   if (numOfVotes[i] > numOfVotes[maxIndex]) {
+    maxIndex = i;
+   }
+  }
+  
+  return maxIndex;
+ }
+
+}
+
